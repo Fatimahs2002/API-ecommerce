@@ -7,6 +7,7 @@ module.exports=(mongoose)=>{
                     type: String,
                     required: true,
                   },
+                 
                 
                   email: {
                     type: String,
@@ -29,8 +30,8 @@ module.exports=(mongoose)=>{
                   },
                   role: {
                     type: String,
-                    enum: ["user", "admin", "therapy"],
-                    default: "user",
+                    enum: [ "admin", "customer"],
+                    default: "customer",
                   },
                },
                {
