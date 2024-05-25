@@ -1,11 +1,59 @@
 const db = require('../models');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-
+// const jwt = require('jsonwebtoken');
+const { generateToken } = require("../middleware/generateToken");
 const User = db.users; // Use consistent variable naming
 
+const getUser = async (_, res) => {
+  const user = await db.find({}).select("-password");
+  try {
+    if (!user || user.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "no users found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message:'users found',
+      data: user,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// get by id
+const getById = async (req, res) => {
+  const { ID } = req.params;
+  const user = await db.findById(ID);
+  try {
+    if (!user || user.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `user not found`,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: `user found`,
+      data: user,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 // Register a new user
-exports.register = async (req, res) => {
+ const register = async (req, res) => {
   const { fullName, email, password, phoneNumber, address } = req.body;
   if (password.length < 6) {
     return res.status(400).json({ message: "Password must be at least 6 characters long" });
@@ -34,22 +82,44 @@ exports.register = async (req, res) => {
 };
 
 // User login
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
+
   try {
-    const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ success: false, message: "Invalid email or password" });
+    const user = await db.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Email or Password Wrong",
+      });
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    return res.status(200).json({ success: true, message: "Logged in successfully", token });
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Email or Password Wrong",
+      });
+    }
+
+    const token = generateToken(user._id, user.role, user.fullName);
+    return res.status(200).json({
+      success: true,
+      message: "Logged in successfully",
+      data: token,
+    });
   } catch (error) {
-    return res.status(500).json({ success: false, message: "An unexpected error occurred" });
+    console.error("Login error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An unexpected error occurred during login.",
+    });
   }
 };
 
 // Switch user role to admin
-exports.switchToAdmin = async (req, res) => {
+const switchToAdmin = async (req, res) => {
   const { ID } = req.params;
   try {
     const switchUser = await User.findByIdAndUpdate(ID, { role: "admin" }, { new: true });
@@ -63,7 +133,7 @@ exports.switchToAdmin = async (req, res) => {
 };
 
 // Delete a user
-exports.deleteAdmin = async (req, res) => {
+const deleteAdmin = async (req, res) => {
   try {
     const { ID } = req.params;
     const user = await User.deleteOne({ _id: ID });
@@ -74,7 +144,7 @@ exports.deleteAdmin = async (req, res) => {
 };
 
 // Update user information
-exports.updateAdmin = async (req, res) => {
+const updateAdmin = async (req, res) => {
   const { ID } = req.params;
   const { fullName, email, phoneNumber, password, address } = req.body;
   try {
@@ -87,4 +157,14 @@ exports.updateAdmin = async (req, res) => {
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
+};
+
+module.exports = {
+  getUser,
+  getById,
+  register,
+  login,
+  updateAdmin,
+  switchToAdmin,
+  deleteAdmin
 };

@@ -2,7 +2,7 @@ const express=require('express');
 const cors=require('cors')
 const app=express();
 const db=require('./models');
-
+const userRoute = require('./routes/userRoute')
 db.mongoose
 .connect(db.url,{
      
@@ -16,14 +16,15 @@ db.mongoose
 
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use('/user', userRoute)
+
 
 app.get('/',(req,res)=>{
      res.json({message:'welcome to my project'})
 })
 
-require('./routes/user.route')(app);
 const PORT=process.env.PORT || 8080;
 app.listen(PORT,()=>{
+     
      console.log(`SERVER RUNNING ${PORT}`)
 })
