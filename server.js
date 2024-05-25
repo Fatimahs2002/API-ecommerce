@@ -23,6 +23,7 @@ app.get('/',(req,res)=>{
 })
 
 require('./routes/user.route')(app);
+require('./routes/category.route')(app);
 const PORT=process.env.PORT || 8080;
 app.listen(PORT,()=>{
      console.log(`SERVER RUNNING ${PORT}`)
