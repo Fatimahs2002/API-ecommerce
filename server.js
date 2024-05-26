@@ -2,7 +2,9 @@ const express=require('express');
 const cors=require('cors')
 const app=express();
 const db=require('./models');
-const userRoute = require('./routes/userRoute')
+const userRoute = require('./routes/userRoute');
+const categoryRoute=require('./routes/categoryRoute');
+const productRoute=require('./routes/productRoute');
 db.mongoose
 .connect(db.url,{
      
@@ -17,8 +19,8 @@ db.mongoose
 app.use(cors());
 app.use(express.json());
 app.use('/user', userRoute)
-
-
+app.use('/category',categoryRoute);
+app.use('/product',productRoute);
 app.get('/',(req,res)=>{
      res.json({message:'welcome to my project'})
 })

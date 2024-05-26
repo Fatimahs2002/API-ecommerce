@@ -8,6 +8,7 @@ const {
   register,
   switchToAdmin,
   updateAdmin,
+  deleteAdmin
 } = require("../controllers/userController");
 
 router.get('/getAll', getUser)
