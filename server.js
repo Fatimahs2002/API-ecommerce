@@ -2,19 +2,13 @@ require('dotenv').config();
 const express=require('express');
 const cors=require('cors')
 const app=express();
-const db=require('./models');
+const connectedToDatabase = require('./config/config')
 const userRoute = require('./routes/userRoute');
 const categoryRoute=require('./routes/categoryRoute');
 const productRoute=require('./routes/productRoute');
-db.mongoose
-.connect(db.url,{
-     
-}).then(()=>{
-     console.log("connected to db")
-}).catch(err=>{
-     console.log("connot connect to DB",err)
-     process.exit();
-})
+
+const PORT = process.env.PORT
+
 
 
 app.use(cors());
@@ -26,8 +20,9 @@ app.get('/',(req,res)=>{
      res.json({message:'welcome to my project'})
 })
 
-const PORT=process.env.PORT || 8080;
+
+
 app.listen(PORT,()=>{
-     
+     connectedToDatabase()
      console.log(`SERVER RUNNING ${PORT}`)
 })

@@ -1,9 +1,6 @@
-const db = require('../models');
-const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
-const { generateToken }=require('../middleware/generateToken');
-
-const User = db.users; // Use consistent variable naming
+const User = require("../models/userModel");
+const bcrypt = require("bcrypt");
+const { generateToken } = require("../middleware/generateToken");
 
 const getUser = async (_, res) => {
   const user = await User.find({}).select("-password");
@@ -17,7 +14,7 @@ const getUser = async (_, res) => {
 
     return res.status(200).json({
       success: true,
-      message:'users found',
+      message: "users found",
       data: user,
     });
   } catch (error) {
@@ -52,13 +49,14 @@ const getById = async (req, res) => {
   }
 };
 
-
 // Register a new user
- const register = async (req, res) => {
+const register = async (req, res) => {
   const { fullName, email, password, phoneNumber, address } = req.body;
- 
+
   if (password.length < 6) {
-    return res.status(400).json({ message: "Password must be at least 6 characters long" });
+    return res
+      .status(400)
+      .json({ message: "Password must be at least 6 characters long" });
   }
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -84,16 +82,10 @@ const getById = async (req, res) => {
 };
 
 // User login
-// const generateToken = (id, role, fullName) => {
-//   // Replace 'your_jwt_secret' with your actual JWT secret key
-//   return jwt.sign({ id, role, fullName }, 'your_jwt_secret', { expiresIn: '1h' });
-// };
 const login = async (req, res) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -110,17 +102,18 @@ const login = async (req, res) => {
       });
     }
 
-    const token = generateToken(user._id, user.role, user.fullName);
-    return res.status(200).json({
+    const token = generateToken(user._id, user.role);
+    res.status(200).json({
       success: true,
-      message: "Logged in successfully",
+      message: "Login successful",
       data: token,
     });
   } catch (error) {
-    console.error("Login error:", error);
-    return res.status(500).json({
+    console.error(error);
+    res.status(400).json({
       success: false,
-      message: "An unexpected error occurred during login.",
+      message: "Error during login",
+      error: error.message,
     });
   }
 };
@@ -129,13 +122,31 @@ const switchToAdmin = async (req, res) => {
   const { ID } = req.params;
   // const {role}=req.body;
   try {
-    const switchUser = await User.findByIdAndUpdate(ID, { role:"admin" }, { new: true });
+    const switchUser = await User.findByIdAndUpdate(
+      ID,
+      { role: "admin" },
+      { new: true }
+    );
     if (!switchUser) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-    res.status(200).json({ success: true, message: "User switched to admin successfully", data: switchUser });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "User switched to admin successfully",
+        data: switchUser,
+      });
   } catch (error) {
-    return res.status(400).json({ success: false, message: "Unable to switch to admin", error: error.message });
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Unable to switch to admin",
+        error: error.message,
+      });
   }
 };
 
@@ -144,9 +155,21 @@ const deleteAdmin = async (req, res) => {
   try {
     const { ID } = req.params;
     const user = await User.deleteOne({ _id: ID });
-    res.status(200).json({ success: true, message: "User deleted successfully", data: user });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "User deleted successfully",
+        data: user,
+      });
   } catch (error) {
-    res.status(400).json({ success: false, message: "Error occurred while deleting the user", error });
+    res
+      .status(400)
+      .json({
+        success: false,
+        message: "Error occurred while deleting the user",
+        error,
+      });
   }
 };
 
@@ -156,11 +179,23 @@ const updateAdmin = async (req, res) => {
   const { fullName, email, phoneNumber, password, address } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.findByIdAndUpdate(ID, { fullName, email, phoneNumber, address, password: hashedPassword }, { new: true });
+    const user = await User.findByIdAndUpdate(
+      ID,
+      { fullName, email, phoneNumber, address, password: hashedPassword },
+      { new: true }
+    );
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-    res.status(200).json({ success: true, message: "User updated successfully", data: user });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "User updated successfully",
+        data: user,
+      });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
@@ -173,5 +208,5 @@ module.exports = {
   login,
   updateAdmin,
   switchToAdmin,
-  deleteAdmin
+  deleteAdmin,
 };
