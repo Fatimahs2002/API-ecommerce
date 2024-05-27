@@ -1,9 +1,12 @@
+
 const jwt = require('jsonwebtoken');
 
-exports.generateToken = (id, role) => {
-  const token = jwt.sign({ id, role }, process.env.JWT_SECRET, {
-    expiresIn: '6h',
-  });
-  console.log('token '   +  token);
-  return token;
+const generateToken = (id, role, fullName) => {
+  const secret = process.env.JWT_SECRET; // Get the secret key from environment variables
+  if (!secret) {
+    throw new Error('JWT secret key is missing');
+  }
+  return jwt.sign({ id, role, fullName }, secret, { expiresIn: '1h' });
 };
+
+module.exports = generateToken;

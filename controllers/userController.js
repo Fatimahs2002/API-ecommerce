@@ -1,11 +1,12 @@
 const db = require('../models');
 const bcrypt = require('bcrypt');
 // const jwt = require('jsonwebtoken');
-const { generateToken } = require("../middleware/generateToken");
+const { generateToken }=require('../middleware/generateToken');
+
 const User = db.users; // Use consistent variable naming
 
 const getUser = async (_, res) => {
-  const user = await db.find({}).select("-password");
+  const user = await User.find({}).select("-password");
   try {
     if (!user || user.length === 0) {
       return res.status(404).json({
@@ -30,7 +31,7 @@ const getUser = async (_, res) => {
 // get by id
 const getById = async (req, res) => {
   const { ID } = req.params;
-  const user = await db.findById(ID);
+  const user = await User.findById(ID);
   try {
     if (!user || user.length === 0) {
       return res.status(404).json({
@@ -55,6 +56,7 @@ const getById = async (req, res) => {
 // Register a new user
  const register = async (req, res) => {
   const { fullName, email, password, phoneNumber, address } = req.body;
+ 
   if (password.length < 6) {
     return res.status(400).json({ message: "Password must be at least 6 characters long" });
   }
@@ -82,11 +84,15 @@ const getById = async (req, res) => {
 };
 
 // User login
+// const generateToken = (id, role, fullName) => {
+//   // Replace 'your_jwt_secret' with your actual JWT secret key
+//   return jwt.sign({ id, role, fullName }, 'your_jwt_secret', { expiresIn: '1h' });
+// };
 const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await db.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(401).json({
@@ -94,6 +100,7 @@ const login = async (req, res) => {
         message: "Email or Password Wrong",
       });
     }
+
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
@@ -117,12 +124,12 @@ const login = async (req, res) => {
     });
   }
 };
-
 // Switch user role to admin
 const switchToAdmin = async (req, res) => {
   const { ID } = req.params;
+  // const {role}=req.body;
   try {
-    const switchUser = await User.findByIdAndUpdate(ID, { role: "admin" }, { new: true });
+    const switchUser = await User.findByIdAndUpdate(ID, { role:"admin" }, { new: true });
     if (!switchUser) {
       return res.status(404).json({ success: false, message: "User not found" });
     }

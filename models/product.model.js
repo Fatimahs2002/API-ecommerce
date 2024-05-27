@@ -33,15 +33,12 @@ module.exports=(mongoose)=>{
             required: true
           }
         }],
-        // category: {
-        //   type: mongoose.Schema.Types.ObjectId,
-        //   ref: 'Category' // Reference to Category model
-        // },
-        // categoryName: {
-        //   type: String,
-        //   required: true
+
+        categoryName: {
+          type: String,
+          required: true
          
-        // },
+        },
       }, 
       { 
         timestamps: true 

@@ -63,7 +63,6 @@ const updateCategory = async (req, res) => {
      const { ID } = req.params;
      const { name } = req.body;
      try {
-     
        const category = await categories.findByIdAndUpdate(ID, { name }, { new: true });
        if (!category) {
          return res.status(404).json({ success: false, message: "Category not found" });
