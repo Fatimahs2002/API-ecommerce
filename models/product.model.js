@@ -1,49 +1,37 @@
 
-module.exports=(mongoose)=>{
-  const products=mongoose.model(
+module.exports = (mongoose) => {
+  const products = mongoose.model(
     "products",
     mongoose.Schema(
       {
         name: {
           type: String,
           required: true,
-           // Remove leading/trailing whitespace
         },
-        image: {
-          type: [String],
-          required: true
-        },
+        images: [{
+          type: String,
+          required: true,
+        }],
         description: {
           type: String,
-          required: true
-          
+          required: true,
         },
         characteristics: [{
-          type: {
-            type: String,
-            required: true
-          },
-          value: {
-            type: String,
-            required: true
-            
-          },
-          price: {
-            type: Number,
-            required: true
-          }
+          type: { type: String, required: true },
+          options: [{
+            value: { type: String, required: true },
+            price: { type: Number, required: true },
+          }],
         }],
-
         categoryName: {
           type: String,
-          required: true
-         
+          required: true,
         },
       }, 
       { 
-        timestamps: true 
+        timestamps: true,
       },
     ),
-  )
+  );
   return products;
 };

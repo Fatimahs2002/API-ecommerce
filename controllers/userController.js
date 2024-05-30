@@ -120,7 +120,7 @@ const login = async (req, res) => {
 // Switch user role to admin
 const switchToAdmin = async (req, res) => {
   const { ID } = req.params;
-  // const {role}=req.body;
+  //const {role}=req.body;
   try {
     const switchUser = await User.findByIdAndUpdate(
       ID,
@@ -151,7 +151,7 @@ const switchToAdmin = async (req, res) => {
 };
 
 // Delete a user
-const deleteAdmin = async (req, res) => {
+const deleteUser = async (req, res) => {
   try {
     const { ID } = req.params;
     const user = await User.deleteOne({ _id: ID });
@@ -208,5 +208,5 @@ module.exports = {
   login,
   updateAdmin,
   switchToAdmin,
-  deleteAdmin,
+  deleteUser,
 };

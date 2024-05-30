@@ -11,12 +11,16 @@ const PORT = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
-app.use("/user", userRoute);
-app.use("/category", categoryRoute);
-app.use("/product", productRoute);
-app.get("/", (req, res) => {
-  res.json({ message: "welcome to my project" });
-});
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/user', userRoute)
+app.use('/category',categoryRoute);
+app.use('/product',productRoute);
+app.get('/',(req,res)=>{
+     res.json({message:'welcome to my project'})
+})
+
+
 
 app.listen(PORT, () => {
   connectedToDatabase();

@@ -6,9 +6,8 @@ module.exports = (mongoose) => {
           mongoose.Schema(
        {
          name: {
-           type: String,
-           required: true,
-           unique: true
+           type: String
+
          }
        },
        {
