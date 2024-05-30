@@ -29,7 +29,7 @@ module.exports=(mongoose)=>{
             
           },
           price: {
-            type: Number, // Use Number type for proper calculations
+            type: Number,
             required: true
           }
         }],
