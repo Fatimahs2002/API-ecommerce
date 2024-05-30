@@ -8,15 +8,17 @@ const {
   register,
   switchToAdmin,
   updateAdmin,
-  deleteAdmin,
+  deleteUser,
 } = require("../controllers/userController");
 
 router.get("/getAll", getUser);
 router.get("/getById/:ID", getById);
 router.post("/register", register);
 router.post("/login", login);
-router.put("/switchAdmin/:ID", isAuthenticated(["admin"]), switchToAdmin);
-router.delete("/deleteadmin/:ID", isAuthenticated(["admin"]), deleteAdmin);
+router.put("/switchAdmin/:ID"
+ , isAuthenticated(["admin"])
+, switchToAdmin);
+router.delete("/delete/:ID", deleteUser);
 router.put("/updateadmin/:ID", isAuthenticated(["admin"]), updateAdmin);
 
 module.exports = router;
