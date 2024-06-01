@@ -10,9 +10,9 @@ const createProduct = async (req, res) => {
   try {
     const { name, description, categoryName, characteristics } = req.body;
 
-    // Check for required fields
-    if (!name || !description || !categoryName || !characteristics) {
-      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    const existingProduct = await Product.findOne({ name });
+    if (existingProduct) {
+      return res.status(400).json({ success: false, message: 'Product name already exists' });
     }
 
     let parsedCharacteristics;
@@ -100,9 +100,8 @@ const deleteProduct = async (req, res) => {
 };
 
 
-const updateProduct=async (req, res) => {
-
-const { ID } = req.params;
+const updateProduct = async (req, res) => {
+  const { ID } = req.params;
   const { name, description, characteristics, categoryName, imagesToRemove } = req.body;
 
   try {
@@ -111,23 +110,35 @@ const { ID } = req.params;
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    // Update characteristics
-    if (characteristics) {
-      product.characteristics = JSON.parse(characteristics);
+    // Check if the new name already exists in another product
+    if (name) {
+      const existingProduct = await Product.findOne({ name, _id: { $ne: ID } });
+      if (existingProduct) {
+        return res.status(400).json({ success: false, message: 'Product name already exists' });
+      }
     }
 
-    // Update category (commented out for now)
-    /*
-    if (categoryName) {
-      const category = await Category.findOne({ name: categoryName });
-      if (!category) {
-        return res.status(400).send('Category not found');
+    // Update characteristics
+    if (characteristics) {
+      try {
+        product.characteristics = JSON.parse(characteristics);
+      } catch (err) {
+        return res.status(400).json({ success: false, message: 'Invalid JSON in characteristics' });
       }
-      if (!product.categories.includes(category._id)) {
-        product.categories.push(category._id);
+
+      // Ensure characteristics is an array
+      if (!Array.isArray(product.characteristics)) {
+        return res.status(400).json({ success: false, message: 'Characteristics must be an array' });
+      }
+
+      // Validate characteristics structure
+      const isValidCharacteristics = product.characteristics.every(characteristic =>
+        characteristic.type && Array.isArray(characteristic.options)
+      );
+      if (!isValidCharacteristics) {
+        return res.status(400).json({ success: false, message: 'Invalid characteristics structure' });
       }
     }
-    */
 
     // Remove selected images
     if (imagesToRemove && imagesToRemove.length > 0) {
@@ -152,9 +163,15 @@ const { ID } = req.params;
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
+};
 
+module.exports = {
+  createProduct,
+  getProducts,
+  deleteProduct,
+  updateProduct,
+};
 
-}
     
 
 module.exports = {
