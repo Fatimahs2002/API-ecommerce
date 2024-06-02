@@ -28,12 +28,7 @@ const addCategory = async (req, res) => {
   console.log(req.body); // Log the request body to see what is being received
   
   const { name } = req.body;
-  if (!name) {
-    return res.status(400).json({
-      success: false,
-      message: "Name is required for adding a category",
-    });
-  }
+
 
   try {
     // Check if the category already exists

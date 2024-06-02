@@ -1,20 +1,22 @@
 const { categories } = require(".");
 
 module.exports = (mongoose) => {
-  const categories = mongoose.model(
-    "categories",
-    mongoose.Schema(
-      {
-        name: {
-          type: String,
-        },
-      },
-      {
-        timestamps: true,
-      }
-    )
-  );
+     const categories=  mongoose.model(
+          "categories",
+          mongoose.Schema(
+       {
+         name: {
+           type: String,
+           required:true
 
-  return categories;
-};
- 
+         }
+       },
+       {
+         timestamps: true
+       }
+     )
+     );
+   
+     return categories;
+   };
+   

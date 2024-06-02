@@ -1,43 +1,35 @@
-module.exports=(mongoose)=>{
-     const orders=mongoose.model(
-          'order',
-          mongoose.Schema
-          ({
-               user: {
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+  const orders = new Schema({
+ 
+        cart:{
+                  type: mongoose.Schema.Types.ObjectId,
+                    ref: "cart",
+                    required: true,
+                },
+                products: [{
+                  productId: {
                     type: mongoose.Schema.Types.ObjectId,
-                    ref: 'User',
+                    ref: "products",
                     required: true,
                   },
-               products:[
-                    {
-                      productId: {
-                        type: mongoose.Schema.Types.ObjectId,
-                        ref: 'Product',
-                        required: true
-                      },
-                      quantity: {
-                        type: Number,
-                        required: true,
-                        min: 1
-                      },
-                    },
-                  ],
-                  totalAmount:{
-                    type: Number,
-                    required: true
-                  },
-                  status: {
-                    type: String,
-                    enum: ['pending', 'completed', 'cancelled'],
-                    default: 'pending'
-                  },
-          },   
-               {
-                    timestamps:true
-               }
-          
-          )
-     )
+                  }],
+                orderStatus: {
+                  type: String,
+                  required: true,
+                  enum: ["Processed", "Delivered", "Cancelled"],
+                  default: "Processed",
+                },
+                orderDate: {
+                  type: Date,
+                  default: Date.now,
+                },
+      }, 
+      
+    );
 
-     return orders
-}
+  const Order = mongoose.model('Order', orders);
+module.exports = Order;
+
+
