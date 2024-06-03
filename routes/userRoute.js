@@ -16,7 +16,7 @@ router.get("/getById/:ID", getById);
 router.post("/register", register);
 router.post("/login", login);
 router.put("/switchAdmin/:ID",
-//  isAuthenticated(["admin"])
+//  isAuthenticated(["admin"]),
  
  switchToAdmin);
 router.delete("/delete/:ID", deleteUser);

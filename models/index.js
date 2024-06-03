@@ -8,5 +8,6 @@ db.url=dbConfig.url;
 db.products=require('./product.model')(mongoose)
 db.users=require('./userModel')(mongoose)
 db.categories=require('./category.model')(mongoose)
-db.orders=require('./order.model')(mongoose)
+db.Orderrder=require('./order.model')
+db.Cart=require('./cartModel')
 module.exports=db;

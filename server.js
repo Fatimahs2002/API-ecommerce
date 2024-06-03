@@ -6,6 +6,8 @@ const connectedToDatabase = require("./config/config");
 const userRoute = require("./routes/userRoute");
 const categoryRoute = require("./routes/categoryRoute");
 const productRoute = require("./routes/productRoute");
+const cartRoute=require('./routes/cartRoute');
+const orderRoute=require('./routes/orderRoute');
 
 const PORT = process.env.PORT;
 
@@ -17,6 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/user', userRoute)
 app.use('/category',categoryRoute);
 app.use('/product',productRoute);
+app.use('/cart',cartRoute);
+app.use('/order',orderRoute)
 app.get('/',(req,res)=>{
      res.json({message:'welcome to my project'})
 })
