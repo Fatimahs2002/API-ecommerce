@@ -4,12 +4,17 @@ const Schema = mongoose.Schema;
 const orderSchema = new Schema({
   orderNumber: {
     type: Number,
-    unique: true, // Ensures the order number is unique
+    unique: true, 
     required: true,
   },
   cart: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "cart",
+    required: true,
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
   products: [{
@@ -31,7 +36,7 @@ const orderSchema = new Schema({
   },
 });
 
-// Define a static method to generate a unique order number
+
 
 
 const Order = mongoose.model('Order', orderSchema);

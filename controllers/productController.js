@@ -1,5 +1,6 @@
 const db = require("../models");
 const Product = db.products;
+
 // const Category = db.categories;
 const { imageUploader } = require('../extra/imgUpload');
 const multer = require('multer');
@@ -62,11 +63,11 @@ const createProduct = async (req, res) => {
 const getProducts = async (_, res) => {
   try {
     const products = await Product.find();
-
+    
     if (!products || products.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No products found",
+        message: 'No products found',
       });
     }
 
@@ -82,6 +83,7 @@ const getProducts = async (_, res) => {
     });
   }
 };
+
 
 
 const getById = async (req, res) => {
