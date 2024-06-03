@@ -1,28 +1,28 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const ordersSchema = new Schema({
+const orderSchema = new Schema({
+  orderNumber: {
+    type: Number,
+    unique: true, // Ensures the order number is unique
+    required: true,
+  },
   cart: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "cart",
     required: true,
   },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
   products: [{
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "products",
       required: true,
     },
   }],
   orderStatus: {
     type: String,
     required: true,
-    enum: ["Processed", "Delivered", "Cancelled"],
+    enum: ["Processed", "Delivered"],
     default: "Processed",
   },
   orderDate: {
@@ -31,5 +31,11 @@ const ordersSchema = new Schema({
   },
 });
 
-const Order = mongoose.model('Order', ordersSchema);
+// Define a static method to generate a unique order number
+
+
+const Order = mongoose.model('Order', orderSchema);
+
 module.exports = Order;
+
+
