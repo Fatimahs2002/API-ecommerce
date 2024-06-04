@@ -1,5 +1,5 @@
 const db = require("../models");
-const Product = db.products;
+const products=require('../models/product.model')
 // const Category = db.categories;
 const { imageUploader } = require('../extra/imgUpload');
 const multer = require('multer');
@@ -10,7 +10,7 @@ const createProduct = async (req, res) => {
   try {
     const { name, description, categoryName, characteristics } = req.body;
 
-    const existingProduct = await Product.findOne({ name });
+    const existingProduct = await products.findOne({ name });
     if (existingProduct) {
       return res.status(400).json({ success: false, message: 'Product name already exists' });
     }
@@ -40,7 +40,7 @@ const createProduct = async (req, res) => {
     const imageURLs = await Promise.all(uploadPromises);
 
     // Create new product
-    const newProduct = new Product({
+    const newProduct = new products({
       name,
       images: imageURLs,
       description,
@@ -61,9 +61,9 @@ const createProduct = async (req, res) => {
 // **Read All Products**
 const getProducts = async (_, res) => {
   try {
-    const products = await Product.find();
+    const product = await products.find();
 
-    if (!products || products.length === 0) {
+    if (!product || product.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No products found",
@@ -73,7 +73,7 @@ const getProducts = async (_, res) => {
     return res.status(200).json({
       success: true,
       message: 'Products found',
-      data: products,
+      data: product,
     });
   } catch (error) {
     return res.status(400).json({
@@ -87,7 +87,7 @@ const getProducts = async (_, res) => {
 const getById = async (req, res) => {
   const { ID } = req.params;
   // console.log(ID)
-  const product = await Product.findById(ID);
+  const product = await products.findById(ID);
   try {
     if (!product || product.length === 0) {
       return res.status(404).json({
@@ -112,7 +112,7 @@ const getById = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const { ID } = req.params;
-    const product = await Product.deleteOne({ _id: ID });
+    const product = await products.deleteOne({ _id: ID });
 
     if (!product.deletedCount) {
       return res.status(404).json({ success: false, message: "Product not found" });
@@ -130,14 +130,14 @@ const updateProduct = async (req, res) => {
   const { name, description, characteristics, categoryName, imagesToRemove } = req.body;
 
   try {
-    let product = await Product.findById(ID);
+    let product = await products.findById(ID);
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
     // Check if the new name already exists in another product
     if (name) {
-      const existingProduct = await Product.findOne({ name, _id: { $ne: ID } });
+      const existingProduct = await products.findOne({ name, _id: { $ne: ID } });
       if (existingProduct) {
         return res.status(400).json({ success: false, message: 'Product name already exists' });
       }
@@ -190,12 +190,7 @@ const updateProduct = async (req, res) => {
   }
 };
 
-module.exports = {
-  createProduct,
-  getProducts,
-  deleteProduct,
-  updateProduct,
-};
+
 
     
 
