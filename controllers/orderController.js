@@ -1,14 +1,15 @@
-const mongoose = require('mongoose');
-const Order = require('../models/order.model');
-const Cart = require('../models/cartModel');
-const Product = require('../models/product.model');
-const User = require('../models/userModel');
+const mongoose = require("mongoose");
+const Order = require("../models/order.model");
+const Cart = require("../models/cartModel");
+const Product = require("../models/product.model");
+const User = require("../models/userModel");
 
 const createOrder = async (req, res) => {
-  const { user, cart, products, orderStatus, orderDate } = req.body;
+  const { user, cartId, products, orderStatus, orderDate } = req.body;
 
-  // Validate required fields
-  if (!user || !cart || !Array.isArray(products) || products.length === 0) {
+  console.log("Received request body:", req.body);
+
+  if (!user || !cartId || !Array.isArray(products) || products.length === 0) {
     return res.status(400).json({
       success: false,
       message: "User, cart, and products are required",
@@ -16,7 +17,6 @@ const createOrder = async (req, res) => {
   }
 
   try {
-    // Validate if the user exists
     const userExists = await User.findById(user);
     if (!userExists) {
       return res.status(400).json({
@@ -25,47 +25,57 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // Validate if the cart exists
-    const cartExists = await Cart.findById(cart);
-    if (!cartExists) {
-      return res.status(400).json({
-        success: false,
-        message: "Referenced cart does not exist",
-      });
-    }
+    // const cartExists = await Cart.findOne({ cartId });
+    // if (!cartExists) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Referenced cart does not exist",
+    //   });
+    // }
 
-    // Validate if all products exist
     for (const product of products) {
-      const productId = product.productId || product;
-      const productExists = await Product.findById(productId);
+      if (!product.productId) {
+        return res.status(400).json({
+          success: false,
+          message: "Each product must have a productId",
+        });
+      }
+
+      const productExists = await Product.findById(product.productId);
       if (!productExists) {
         return res.status(400).json({
           success: false,
-          message: `Referenced product with ID ${productId} does not exist`,
+          message: `Referenced product with ID ${product.productId} does not exist`,
         });
       }
     }
 
-    // Generate a unique order number
     const orderNumber = await generateUniqueOrderNumber();
 
-    // Create the order
-    const newOrder = new Order({ user, orderNumber, cart, products, orderStatus, orderDate });
+    const newOrder = new Order({
+      user,
+      orderNumber,
+      cartId,
+      products,
+      orderStatus,
+      orderDate,
+    });
 
     await newOrder.save();
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
       message: "Order created successfully",
       data: newOrder,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error creating order:", error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message,
     });
   }
 };
+
 
 // Function to generate a unique order number
 const generateUniqueOrderNumber = async () => {
@@ -89,8 +99,10 @@ const generateUniqueOrderNumber = async () => {
 // Read orders
 const getOrders = async (_, res) => {
   try {
-    const orders = await Order.find().populate('user').populate('products.productId');
-    
+    const orders = await Order.find()
+      .populate("user")
+      .populate("products.productId");
+
     if (!orders || orders.length === 0) {
       return res.status(404).json({
         success: false,
@@ -100,7 +112,7 @@ const getOrders = async (_, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Orders found',
+      message: "Orders found",
       data: orders,
     });
   } catch (error) {
@@ -148,14 +160,17 @@ const updateOrderStatus = async (req, res) => {
     }
 
     // Validate status transition
-    if (order.orderStatus === 'Delivered' || order.orderStatus === 'Cancelled') {
+    if (
+      order.orderStatus === "Delivered" ||
+      order.orderStatus === "Cancelled"
+    ) {
       return res.status(400).json({
         success: false,
         message: "Cannot change status from 'Delivered' or 'Cancelled'",
       });
     }
 
-    if (['Processed', 'Delivered', 'Cancelled'].includes(status)) {
+    if (["Pending", "Delivered", "Cancelled"].includes(status)) {
       order.orderStatus = status;
       await order.save();
       return res.status(200).json({
@@ -169,12 +184,11 @@ const updateOrderStatus = async (req, res) => {
         message: "Invalid status",
       });
     }
-
   } catch (error) {
     console.error(error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message,
     });
   }
 };

@@ -53,6 +53,7 @@ const User = new Schema({
   },
   address: { type: String, required: true },
   role: { type: String, enum: ["admin", "customer"], default: "customer" },
+  user: { type: Schema.Types.ObjectId, ref: "user" }
 });
 const user = model("user", User);
 module.exports = user;

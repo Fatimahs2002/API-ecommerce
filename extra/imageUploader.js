@@ -10,3 +10,5 @@ exports.imageUploader = async (req) => {
   const response = await axios.post('https://api.imgbb.com/1/upload', formData);
   return response?.data?.data?.url;
 }
+
+

@@ -16,7 +16,7 @@ const getCategories = async (_, res) => {
       data: categories,
     });
   } catch (error) {
-    console.error(error); // Log the error for debugging
+    // console.error(error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
