@@ -30,5 +30,51 @@ const createCart = async (req, res, next) => {
     });
   }
 }
+const getCart = async (_, res) => {
+  const cart = await Cart.find({}).select("-password");
+  try {
+    if (!cart || cart.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "no carts found",
+      });
+    }
 
-module.exports = { createCart };
+    return res.status(200).json({
+      success: true,
+      message: "carts found",
+      data: cart,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+// get by id
+const cartById = async (req, res) => {
+  const { ID } = req.params;
+  const cart = await Cart.findById(ID);
+  try {
+    if (!cart || cart.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `user not found`,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: `cart found`,
+      data: cart,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+module.exports = { createCart, getCart, cartById };
