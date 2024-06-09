@@ -8,6 +8,7 @@ const cartSchema = new Schema({
     ref: 'user',
     required: true
   },
+  
   // other fields
 });
 const cart = mongoose.model('Cart', cartSchema);

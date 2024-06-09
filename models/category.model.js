@@ -1,22 +1,22 @@
-const { categories } = require(".");
+const mongoose=require('mongoose');
+const Schema=mongoose.Schema
 
-module.exports = (mongoose) => {
-     const categories=  mongoose.model(
-          "categories",
-          mongoose.Schema(
-       {
+     const categoryScehma=  new Schema({
+
          name: {
            type: String,
            required:true
 
-         }
-       },
-       {
-         timestamps: true
-       }
-     )
-     );
+         },
+         SubCategory:[{
+          type: Schema.Types.ObjectId,
+          ref: 'SubCategory',
+          required: false
+        }],
+         
+
+     });
    
-     return categories;
-   };
+    const categories=mongoose.model('categories',categoryScehma);
+    module.exports=categories;
    

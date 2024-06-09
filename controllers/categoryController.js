@@ -1,10 +1,11 @@
 const db = require('../models');
-const Category = db.categories;
-const mongoose=require('mongoose');
+const categories = require('../models/category.model');
+const mongoose = require('mongoose');
+
 const getCategories = async (_, res) => {
   try {
-    const categories = await Category.find();
-    if (!categories || categories.length === 0) {
+    const category = await categories.find();
+    if (!category || category.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No categories found",
@@ -13,10 +14,10 @@ const getCategories = async (_, res) => {
     return res.status(200).json({
       success: true,
       message: 'Categories found',
-      data: categories,
+      data: category,
     });
   } catch (error) {
-    // console.error(error);
+    console.error(error); // Uncommented for debugging
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -26,13 +27,11 @@ const getCategories = async (_, res) => {
 
 const addCategory = async (req, res) => {
   console.log(req.body); // Log the request body to see what is being received
-  
   const { name } = req.body;
-
 
   try {
     // Check if the category already exists
-    const existingCategory = await Category.findOne({ name });
+    const existingCategory = await categories.findOne({ name });
     if (existingCategory) {
       return res.status(409).json({
         success: false,
@@ -41,7 +40,7 @@ const addCategory = async (req, res) => {
     }
 
     // Create a new category
-    const newCategory = new Category({ name });
+    const newCategory = new categories({ name });
     await newCategory.save();
     return res.status(201).json({
       success: true,
@@ -57,21 +56,27 @@ const addCategory = async (req, res) => {
   }
 };
 
-
 const deleteCategory = async (req, res) => {
   try {
     const { ID } = req.params;
-    const category = await Category.deleteOne({ _id: ID });
+    const result = await categories.deleteOne({ _id: ID });
     console.log(ID);
-    // Check if a category was actually delet
+    
+    // Check if a category was actually deleted
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
     
     res.status(200).json({
       success: true,
       message: "Category deleted successfully",
-      data: category,
     });
   } catch (error) {
-    res.status(400).json({
+    console.error(error); // Log the error for debugging
+    res.status(500).json({
       success: false,
       message: "Error occurred while deleting the category",
       error: error.message, // Send only the error message
@@ -79,12 +84,11 @@ const deleteCategory = async (req, res) => {
   }
 };
 
-
 const updateCategory = async (req, res) => {
   const { ID } = req.params;
   const { name } = req.body;
   try {
-    const updatedCategory = await Category.findByIdAndUpdate(ID, { name }, { new: true });
+    const updatedCategory = await categories.findByIdAndUpdate(ID, { name }, { new: true });
 
     if (!updatedCategory) {
       return res.status(404).json({ success: false, message: "Category not found" });
@@ -104,11 +108,9 @@ const updateCategory = async (req, res) => {
       });
     }
     console.error(error);
-    res.status(400).json({ success: false, message: "An error occurred" });
+    res.status(500).json({ success: false, message: "An error occurred" });
   }
 };
-
-
 
 module.exports = {
   getCategories,
@@ -116,5 +118,3 @@ module.exports = {
   deleteCategory,
   updateCategory,
 };
-
-

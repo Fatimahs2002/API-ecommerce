@@ -10,4 +10,5 @@ db.users=require('./userModel')(mongoose)
 db.categories=require('./category.model')(mongoose)
 db.Orderrder=require('./order.model')
 db.Cart=require('./cartModel')
+db.SubCategory=require('./SubCategoryModel');
 module.exports=db;
