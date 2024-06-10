@@ -5,7 +5,7 @@ const Product = require("../models/product.model");
 const User = require("../models/userModel");
 
 const createOrder = async (req, res) => {
-  const { user, cartId, products, orderStatus, orderDate } = req.body;
+  const { user, cartId, products, orderStatus, orderDate , price} = req.body;
 
   console.log("Received request body:", req.body);
 
@@ -59,6 +59,7 @@ const createOrder = async (req, res) => {
       products,
       orderStatus,
       orderDate,
+      price
     });
 
     await newOrder.save();
@@ -147,7 +148,7 @@ const deleteOrder = async (req, res) => {
 // Update Order Status
 const updateOrderStatus = async (req, res) => {
   const { ID } = req.params;
-  const { status } = req.body; // Get new status from request body
+  const { status } = req.body; 
 
   try {
     const order = await Order.findById(ID);

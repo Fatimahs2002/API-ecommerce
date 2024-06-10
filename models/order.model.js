@@ -39,6 +39,10 @@ const orderSchema = new Schema({
     enum: [ "Delivered", "Pending"],
     default: "Pending",
   },
+  price: {
+    type: Number,
+    required: true,
+  },
   orderDate: {
     type: Date,
     default: Date.now,

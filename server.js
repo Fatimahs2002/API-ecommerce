@@ -8,7 +8,7 @@ const categoryRoute = require("./routes/categoryRoute");
 const productRoute = require("./routes/productRoute");
 const cartRoute=require('./routes/cartRoute');
 const orderRoute=require('./routes/orderRoute');
-
+const SubCategoryRoute=require('./routes/SubCategoryRoute');
 const PORT = process.env.PORT;
 
 
@@ -21,7 +21,7 @@ app.use('/category',categoryRoute);
 app.use('/product',productRoute);
 app.use('/cart',cartRoute);
 app.use('/order',orderRoute)
-
+app.use('/SubCategory',SubCategoryRoute);
 app.get('/',(req,res)=>{
      res.json({message:'welcome to my project'})
 })
