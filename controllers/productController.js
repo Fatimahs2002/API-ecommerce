@@ -7,7 +7,7 @@ const upload = multer({ dest: "uploads/" }).array("images", 10);
 // **Create Product**
 const createProduct = async (req, res) => {
   try {
-    const { name, description, categoryName, characteristics } = req.body;
+    const { name, description, categoryName, characteristics , subCategoryName} = req.body;
 
     const existingProduct = await products.findOne({ name });
     if (existingProduct) {
@@ -54,12 +54,12 @@ const createProduct = async (req, res) => {
       description,
       characteristics: parsedCharacteristics,
       categoryName,
+      subCategoryName,
     });
-
     // Save product
     await newProduct.save();
     res
-      .status(201)
+      .status(200)
       .json({
         success: true,
         message: "Product created successfully",
@@ -152,15 +152,12 @@ const deleteProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   const { ID } = req.params;
-  const { name, description, characteristics, categoryName, imagesToRemove } =
-    req.body;
+  const { name, description, characteristics, categoryName, imagesToRemove, subCategoryName } = req.body;
 
   try {
     let product = await products.findById(ID);
     if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
+      return res.status(404).json({ success: false, message: "Product not found" });
     }
 
     // Check if the new name already exists in another product
@@ -170,9 +167,7 @@ const updateProduct = async (req, res) => {
         _id: { $ne: ID },
       });
       if (existingProduct) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Product name already exists" });
+        return res.status(400).json({ success: false, message: "Product name already exists" });
       }
     }
 
@@ -181,19 +176,15 @@ const updateProduct = async (req, res) => {
       try {
         product.characteristics = JSON.parse(characteristics);
       } catch (err) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid JSON in characteristics" });
+        return res.status(400).json({ success: false, message: "Invalid JSON in characteristics" });
       }
 
       // Ensure characteristics is an array
       if (!Array.isArray(product.characteristics)) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Characteristics must be an array",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Characteristics must be an array",
+        });
       }
 
       // Validate characteristics structure
@@ -202,12 +193,10 @@ const updateProduct = async (req, res) => {
           characteristic.type && Array.isArray(characteristic.options)
       );
       if (!isValidCharacteristics) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid characteristics structure",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid characteristics structure",
+        });
       }
     }
 
@@ -229,20 +218,21 @@ const updateProduct = async (req, res) => {
     if (name) product.name = name;
     if (description) product.description = description;
     if (categoryName) product.categoryName = categoryName;
+    if (subCategoryName) product.subCategoryName = subCategoryName;
 
     await product.save();
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Product updated successfully",
-        data: product,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      data: product,
+    });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
+
 
 module.exports = {
   createProduct,
