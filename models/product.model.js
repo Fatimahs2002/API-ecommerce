@@ -35,7 +35,7 @@ const productSchema = new Schema(
 
     subCategoryName: {
       type: String,
-      required: true,
+      required: false,
     },
   },
   {
