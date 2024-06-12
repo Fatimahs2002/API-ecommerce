@@ -9,6 +9,7 @@ const productRoute = require("./routes/productRoute");
 const cartRoute = require("./routes/cartRoute");
 const orderRoute = require("./routes/orderRoute");
 const SubCategoryRoute = require("./routes/SubCategoryRoute");
+const emailRoutes = require('./extra/sendEmails')
 const PORT = process.env.PORT;
 
 app.use(cors());
@@ -21,7 +22,7 @@ app.use("/product", productRoute);
 app.use("/cart", cartRoute);
 app.use("/order", orderRoute);
 app.use("/subcategory", SubCategoryRoute);
-
+app.use('/api', emailRoutes);
 
 app.get("/", (_, res) => {
   res.json({ message: "welcome to my project" });
