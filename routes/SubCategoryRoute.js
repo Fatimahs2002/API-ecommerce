@@ -14,3 +14,4 @@ router.get("/get", getSubCategory);
 router.delete("/delete/:ID", deleteSubCategory);
 router.put("/update/:ID", updateSubCategory);
 module.exports = router;
+

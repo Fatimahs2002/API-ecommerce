@@ -9,3 +9,4 @@ const categoryScehma = new Schema({
 });
 const categories = mongoose.model("Category", categoryScehma);
 module.exports = categories;
+

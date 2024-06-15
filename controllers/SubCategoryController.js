@@ -1,12 +1,36 @@
 const db = require("../models"); // Adjust the path as needed
 const SubCategory = db.SubCategory;
 const Category = require("../models/category.model");
+const Product=require("../models/product.model");
 const mongoose = require("mongoose");
 
 // Get all subcategories
+// const getSubCategory = async (_, res) => {
+//   try {
+//     const subCategories = await SubCategory.find();
+//     if (!subCategories || subCategories.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "No subcategories found",
+//       });
+//     }
+//     return res.status(200).json({
+//       success: true,
+//       message: "Subcategories found",
+//       data: subCategories,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//     });
+//   }
+// };
+
 const getSubCategory = async (_, res) => {
   try {
-    const subCategories = await SubCategory.find();
+    const subCategories = await SubCategory.find().populate('category');
     if (!subCategories || subCategories.length === 0) {
       return res.status(404).json({
         success: false,
@@ -99,11 +123,45 @@ const addSubCategory = async (req, res) => {
 };
 
 // Delete a subcategory
+// const deleteSubCategory = async (req, res) => {
+//   try {
+//     const { ID } = req.params;
+
+//     // Find the subcategory to get the category ID
+//     const subCategory = await SubCategory.findById(ID);
+//     if (!subCategory) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Subcategory not found",
+//       });
+//     }
+
+//     // Delete the subcategory
+//     await SubCategory.deleteOne({ _id: ID });
+
+//     // Remove the subcategory from the category's subCategories array
+//     await Category.updateOne(
+//       { _id: subCategory.category },
+//       { $pull: { subCategories: subCategory._id } }
+//     );
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Subcategory deleted successfully",
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//     });
+//   }
+// };
 const deleteSubCategory = async (req, res) => {
   try {
     const { ID } = req.params;
 
-    // Find the subcategory to get the category ID
+    // Find the subcategory to get the name
     const subCategory = await SubCategory.findById(ID);
     if (!subCategory) {
       return res.status(404).json({
@@ -112,6 +170,8 @@ const deleteSubCategory = async (req, res) => {
       });
     }
 
+    const subCategoryName = subCategory.name;
+
     // Delete the subcategory
     await SubCategory.deleteOne({ _id: ID });
 
@@ -119,6 +179,12 @@ const deleteSubCategory = async (req, res) => {
     await Category.updateOne(
       { _id: subCategory.category },
       { $pull: { subCategories: subCategory._id } }
+    );
+
+    // Remove the subcategory from all products
+    await Product.updateMany(
+      { subCategoryName: subCategoryName },
+      { $unset: { subCategoryName: "" } }
     );
 
     return res.status(200).json({
@@ -134,22 +200,70 @@ const deleteSubCategory = async (req, res) => {
   }
 };
 
+
 // Update a subcategory
+// const updateSubCategory = async (req, res) => {
+//   const { ID } = req.params;
+//   const { name } = req.body;
+//   try {
+//     const updatedSubCategory = await SubCategory.findByIdAndUpdate(
+//       ID,
+//       { name },
+//       { new: true }
+//     );
+
+//     if (!updatedSubCategory) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Subcategory not found" });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Subcategory updated successfully",
+//       data: updatedSubCategory,
+//     });
+//   } catch (error) {
+//     // Handle MongoServerError: Duplicate Key
+//     if (error.code === 11000 && error.keyPattern && error.keyPattern.name) {
+//       return res.status(409).json({
+//         success: false,
+//         message: "Subcategory with this name already exists",
+//       });
+//     }
+//     console.error(error);
+//     return res
+//       .status(500)
+//       .json({ success: false, message: "Internal server error" });
+//   }
+// };
 const updateSubCategory = async (req, res) => {
   const { ID } = req.params;
   const { name } = req.body;
+
   try {
+    const subCategory = await SubCategory.findById(ID);
+    if (!subCategory) {
+      return res.status(404).json({
+        success: false,
+        message: "Subcategory not found",
+      });
+    }
+
+    const oldName = subCategory.name;
     const updatedSubCategory = await SubCategory.findByIdAndUpdate(
       ID,
       { name },
       { new: true }
     );
 
-    if (!updatedSubCategory) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Subcategory not found" });
-    }
+    // Update the subcategory name in all products
+    const result = await Product.updateMany(
+      { subCategoryName: oldName },
+      { $set: { subCategoryName: name } }
+    );
+
+    console.log(`Updated ${result.nModified} products`);
 
     return res.status(200).json({
       success: true,
@@ -178,3 +292,12 @@ module.exports = {
   deleteSubCategory,
   updateSubCategory,
 };
+
+module.exports = {
+  getSubCategory,
+  getById,
+  addSubCategory,
+  deleteSubCategory,
+  updateSubCategory,
+};
+
