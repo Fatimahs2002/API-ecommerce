@@ -96,6 +96,8 @@ const getProducts = async (_, res) => {
   }
 };
 
+
+
 const getById = async (req, res) => {
   const { ID } = req.params;
   // console.log(ID)
