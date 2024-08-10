@@ -530,10 +530,10 @@ const updateSubCategory = async (req, res) => {
 };
 //get SubCategory by id of category:
 const getSubCategoriesByCategory = async (req, res) => {
-  const { category } = req.query;
+  const { categoryId } = req.params;
   
   try {
-    const subCategories = await SubCategory.find({ category }).populate('category');
+    const subCategories = await SubCategory.find({ category: categoryId }).populate('category');
     if (!subCategories || subCategories.length === 0) {
       return res.status(404).json({
         success: false,
@@ -554,6 +554,9 @@ const getSubCategoriesByCategory = async (req, res) => {
     });
   }
 };
+
+module.exports = { getSubCategoriesByCategory };
+
 
 module.exports = {
   getSubCategory,
