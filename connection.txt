@@ -1,0 +1,14 @@
+MONGO_URL='mongodb+srv://rahalmohamad21:F9xAQiaz0BMCQ4NC@cluster0.dnkwfve.mongodb.net/'
+password:MpWWwAu7SS2dT6BF
+
+mongodb+srv://fatimahassanhassan8:<password>@cluster0.hcrkdds.mongodb.net/
+
+admin:
+{ 
+"fullName":"fatima hassan",
+"email":"fatimahassan*@gmail.com",
+"password":"12345678910",
+"phoneNumber":"81724159",
+"address":"tyre",
+"role":"admin"
+}
